@@ -2,6 +2,8 @@
 
 A playful, browser-only question game for team Fika. Twelve original animal friends wander and hop around the screen. Pick one to flip it into a post-it with a conversation starter; pick the note again to turn it back.
 
+![Fika Friends characters and a question post-it](screenshots/playground.jpg)
+
 ## Play
 
 Share your screen, invite someone to choose a character, and answer the question together. Anyone can pass. Selecting another character reveals another question. Reload the page to start a fresh round.
