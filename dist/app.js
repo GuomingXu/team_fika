@@ -8,6 +8,8 @@ const friends = [
 ];
 // Equalize each sprite's longest visible dimension, accounting for transparent padding.
 const spriteScale = [0.971,1.026,0.976,1.040,0.985,1.023,0.950,0.948,1.015,0.956,1.078,1.037];
+// Ground contact positions measured from the visible lower edge of each sprite.
+const footAnchors = [[.561,.950],[.511,.950],[.476,.952],[.486,.950],[.485,.943],[.445,.952],[.556,.941],[.489,.903],[.513,.954],[.446,.944],[.466,.896],[.506,.952]];
 const questions = [
   'What harmless opinion will you defend forever?', 'What’s your most questionable food combination?',
   'What tiny thing makes you irrationally competitive?', 'What popular trend do you just not understand?',
@@ -31,7 +33,7 @@ const items=friends.map((friend,i)=>{
   const button=document.createElement('button');button.type='button';button.className='friend';button.setAttribute('aria-pressed','false');button.setAttribute('aria-label',`Turn over ${friend.name}`);button.style.setProperty('--hop-duration',`${3.3+i*.37}s`);button.style.setProperty('--hop-delay',`${-i*.6}s`);
   const shadow=document.createElement('span'),jumper=document.createElement('span'),flipper=document.createElement('span'),front=document.createElement('span'),back=document.createElement('span'),img=document.createElement('img');
   shadow.className='shadow';jumper.className='jumper';flipper.className='flipper';front.className='face';back.className='back';img.src=friend.image;img.style.setProperty('--sprite-scale',spriteScale[i]);img.alt='';img.draggable=false;front.append(img);flipper.append(front,back);jumper.append(flipper);button.append(shadow,jumper);field.append(button);
-  const item={button,back,jumper,shadow,x:0,y:0,vx:0,vy:0,z:0,vz:0,tilt:(Math.random()-.5)*14,nextTurn:0,held:false,question:''};
+  const item={button,back,jumper,shadow,foot:footAnchors[i],x:0,y:0,vx:0,vy:0,z:0,vz:0,tilt:(Math.random()-.5)*14,nextTurn:0,held:false,question:''};
   button.addEventListener('pointerdown',()=>{item.held=true});for(const event of ['pointerup','pointercancel','pointerleave'])button.addEventListener(event,()=>{item.held=false});
   button.addEventListener('click',()=>{
     if(active===item){close(item);return}
@@ -50,8 +52,14 @@ function draw(item){
   const size=item.button.offsetWidth;
   item.button.style.transform=`translate3d(${item.x}px,${item.y}px,0)`;
   item.button.style.zIndex=item===active?'9500':item.held?'9000':String(Math.round(item.y+size));
-  item.jumper.style.transform=`translateY(${-item.z}px) rotate(${item===active?0:item.tilt+item.z*item.vx*.006}deg)`;
-  item.shadow.style.transform=`scale(${Math.max(.35,1-item.z/size*.8)})`;
+  const angle=item===active?0:item.tilt+item.z*item.vx*.006;
+  item.jumper.style.transform=`translateY(${-item.z}px) rotate(${angle}deg)`;
+  const hoverScale=item.button.matches(':hover')?1.08:1;
+  const dx=(item.foot[0]-.5)*size*hoverScale,dy=(item.foot[1]-.5)*size*hoverScale;
+  const radians=angle*Math.PI/180;
+  item.shadow.style.left=`${size/2+dx*Math.cos(radians)-dy*Math.sin(radians)}px`;
+  item.shadow.style.top=`${size/2+dx*Math.sin(radians)+dy*Math.cos(radians)}px`;
+  item.shadow.style.transform=`translate(-50%,-50%) scale(${Math.max(.35,1-item.z/size*.8)})`;
 }
 function setup(){
   const cols=field.clientWidth<600?3:Math.max(3,Math.min(5,Math.round(Math.sqrt(items.length*field.clientWidth/field.clientHeight)))),rows=Math.ceil(items.length/cols);

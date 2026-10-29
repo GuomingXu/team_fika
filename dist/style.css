@@ -5,3 +5,7 @@
 .friend{width:clamp(140px,16vw,195px);height:clamp(140px,16vw,195px)}@media(max-width:600px){.friend{width:clamp(108px,28vw,140px);height:clamp(108px,28vw,140px)}}
 
 .face img{scale:var(--sprite-scale,1)}.friend:hover .face img{scale:calc(var(--sprite-scale,1) * 1.08)}
+
+.shadow{bottom:auto;pointer-events:none}
+/* Keep artwork inside the same square used to position its ground shadow. */
+.face{display:block}
